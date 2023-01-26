@@ -2,7 +2,7 @@
 
 julia_version = "1.8.3"
 manifest_format = "2.0"
-project_hash = "504da569a2f70ab091c5c0101b51481271c4c9ae"
+project_hash = "c9e1bbe4a6605010d18e38d87b73c4e1e249d532"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -21,13 +21,6 @@ deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
 git-tree-sha1 = "844b061c104c408b24537482469400af6075aae4"
 uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.5"
-
-[[deps.ClusterDepth]]
-git-tree-sha1 = "a9254ff2609bffe2c36a7a8b840ba89df091d310"
-repo-rev = "main"
-repo-url = ".."
-uuid = "c8d8bbfa-f476-4995-adff-2987f04015d1"
-version = "0.1.0"
 
 [[deps.Compat]]
 deps = ["Dates", "LinearAlgebra", "UUIDs"]
