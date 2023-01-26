@@ -1,6 +1,6 @@
 using ClusterDepth
 using Documenter
-
+using Glob
 DocMeta.setdocmeta!(ClusterDepth, :DocTestSetup, :(using ClusterDepth); recursive=true)
 
 
