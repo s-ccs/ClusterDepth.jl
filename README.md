@@ -5,6 +5,9 @@
 [![Build Status](https://github.com/behinger/ClusterDepth.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/behinger/ClusterDepth.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/behinger/ClusterDepth.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/behinger/ClusterDepth.jl)
 
+Fast implementation of the ClusterDepth multiple comparison algorithm from Frossard and Renaud [Neuroimage 2022](https://doi.org/10.1016/j.neuroimage.2021.118824)
+
+This is especially interesting to EEG signals. Currently only acts on a single channel/timeseries. Multichannel as discussed in the paper is the next step.
 ## Citing
 
 See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
