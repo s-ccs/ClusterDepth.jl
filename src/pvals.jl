@@ -70,7 +70,7 @@ function pvals(stat,Jₖ::NTuple{T,ClusterDepthMatrix},τ;type=:troendle) where{
              
                     p[ix] = (1+sum(stat[ix] .<= getJVal(Jₖ[1].J,len[k])))/(size(Jₖ[1].J,2)+1)
                 if length(Jₖ) == 2
-                    tail_p = (1+sum(p[ix],mean(stat[ix] .<= getJVal(Jₖ[2].J,len[k])))) ./(size(Jₖ[2].J,2)+1)
+                    tail_p = (1+sum((stat[ix] .<= getJVal(Jₖ[2].J,len[k])))) ./(size(Jₖ[2].J,2)+1)
                     p[ix] = max(p[ix],tail_p)
                 end
             end

@@ -13,7 +13,7 @@ Optional
 
 """
 clusterdepth(data::AbstractMatrix,args...;kwargs...) = clusterdepth(MersenneTwister(1),data,args...;kwargs...)
-function clusterdepth(rng,data::AbstractMatrix;τ=2.3, statFun=x->abs.(studentt),permFun=sign_permute,nperm=5000,pval_type=:troendle)
+function clusterdepth(rng,data::AbstractMatrix;τ=2.3, statFun=x->abs.(studentt(x)),permFun=sign_permute,nperm=5000,pval_type=:troendle)
 	cdmTuple = perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=nperm)
 	return pvals(statFun(data),cdmTuple,τ;type=pval_type)
 end
