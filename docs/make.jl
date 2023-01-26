@@ -15,11 +15,11 @@ end
 makedocs(;
     modules=[ClusterDepth],
     authors="Benedikt V. Ehinger",
-    repo="https://github.com/behinger/ClusterDepth.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/s-ccs/ClusterDepth.jl/blob/{commit}{path}#{line}",
     sitename="ClusterDepth.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://behinger.github.io/ClusterDepth.jl",
+        canonical="https://s-ccs.github.io/ClusterDepth.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -30,6 +30,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/behinger/ClusterDepth.jl",
+    repo="github.com/s-ccs/ClusterDepth.jl",
     devbranch="main",
 )
