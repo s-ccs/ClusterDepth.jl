@@ -1,21 +1,34 @@
 """
-Permutation via random sign-flip
-Flips signs along the second dimension
+calculate clusterdepth of given datamatrix. 
+
+clusterdepth([rng],data::AbstractMatrix,τ=2.3, statFun=twosided_studentt,nperm=5000;pval_type=:troendle)
+
+	- `data`: `statFun` will be applied on second dimension of data (typically this will be subjects)
+
+Optional
+	- `τ`: Cluster-forming threshold 
+	- `statFun`: default  `studenttest`, can be any custom function on a Matrix returning a Vector
+	- `nperm`: number of permutations, default 5000
+	- `pval_type`: how to calculate pvalues within each cluster, default `:troendle`, see `?pvals`
+
 """
-function sign_permute(rng,x::AbstractMatrix,fun) 
-	binflip=repeat(((rand(rng,size(x,2)).>0.5).*2).-1, 1,size(x,1))'
-	return fun(x.*binflip)
+clusterdepth(data::AbstractMatrix,args...;kwargs...) = clusterdepth(MersenneTwister(1),data,args...;kwargs...)
+function clusterdepth(rng,data::AbstractMatrix;τ=2.3, statFun=x->abs.(studentt),permFun=sign_permute,nperm=5000,pval_type=:troendle)
+	cdmTuple = perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=nperm)
+	return pvals(statFun(data),cdmTuple,τ;type=pval_type)
 end
 
 
-function perm_clusterdepths_both(rng,data,statFun,τ;nₚ=1000)
 
-	Jₖ_head = spzeros(m-1,nₚ)
-	Jₖ_tail = spzeros(m-1,nₚ)
+
+function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
+
+	Jₖ_head = spzeros(size(data,1),nₚ)
+	Jₖ_tail = spzeros(size(data,1),nₚ)
 	
 	for i = 1:nₚ
 		# permute	
-		d0 = sign_permute(rng,data,statFun)
+		d0 = permFun(rng,data,statFun)
 
 		# get clusterdepth
 		(fromTo,head,tail) = calc_clusterdepth(d0,τ)
@@ -32,7 +45,7 @@ function perm_clusterdepths_both(rng,data,statFun,τ;nₚ=1000)
 			return sparse(i,j,v,maximum(i),nₚ)
 		end
 	#return all of it
-	return shrink(Jₖ_head), shrink(Jₖ_tail)
+	return ClusterDepthMatrix(shrink(Jₖ_head)), ClusterDepthMatrix(shrink(Jₖ_tail))
 end
 
 

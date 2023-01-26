@@ -1,9 +1,39 @@
 """
-Takes a matrix filled with permutation results (results x permutations) and a observed matrix (size results) and calculates the p-values for each entry along 
+
+pvals_rankbased(perm::AbstractMatrix,stat::AbstractVector;kwargs...)
+pvals_rankbased(cdm::ClusterDepthMatrix,stat::AbstractSparseVector;kwargs...)
+
+Takes a matrix filled with permutation results and a observed matrix (size ntests) and calculates the p-values for each entry along 
 the permutation dimension 
+
+`perm`: Matrix of permutations with dimensions `(ntests x permutations)`
+`stat`: Vector of observed statistics size `ntests`
+
+
+For `cdm::ClusterDepthMatrix` we can easily trim the permutation matrix towards the end (as it is actually a ragged Matrix).
+That is, the permutation matrix might look like:
+
+perm = [
+    x x x x x x x;
+    x x . x . x x;
+    x x . x . . x;
+    x x . . . . x;
+    . x . . . . .;
+    . . . . . . .;
+    . . . . . . .;
+    . . . . . . .;
+]
+
+Then the last three rows can simply be removed. rowwise-Ranks/pvalues would be identical anyway
+
+The same will be checked for the stat-vector, if the stat vector is only "3" depths long, but the permutation has been calculated for "10" depths, we do not need to check the last 7 depths
+of the permutation matrix.
+
+**Output** will always be Dense Matrix (length(stat),nperm+1) with the first column being the pvalues of the observations
 """
-function pvals_rankbased(perm::AbstractSparseMatrixCSC,
-                            stat::AbstractVector;type=:twosided) 
+
+function pvals_rankbased(cdm::ClusterDepthMatrix,stat::AbstractSparseVector;kwargs...)
+    perm =cdm.J
     if length(stat) > size(perm,1) # larger cluster in stat than perms
         perm = sparse(findnz(perm)...,length(stat),size(perm,2))
     elseif length(stat) < size(perm,1) 
@@ -12,9 +42,12 @@ function pvals_rankbased(perm::AbstractSparseMatrixCSC,
         ix = i .<= length(stat)
         perm = sparse(i[ix],j[ix],v[ix],length(stat),size(perm,2))
     end
-    
-    
-    # add stat to perm
+    pvals = pvals_rankbased(perm,stat;kwargs...)
+    return pvals
+end
+function pvals_rankbased(perm::AbstractMatrix,stat::AbstractVector;type=:twosided) 
+
+   # add stat to perm
     d = hcat(stat,perm)
     
     # fix specific testing
@@ -22,6 +55,9 @@ function pvals_rankbased(perm::AbstractSparseMatrixCSC,
         d = .-abs.(d)
     elseif type==:greater
         d = .-d
+    elseif type==:lesser
+    else
+        error("unknown type")
     end
 
     d = Matrix(d)
@@ -35,27 +71,6 @@ function pvals_rankbased(perm::AbstractSparseMatrixCSC,
     
 end
 
-"""
-calculates pvalues based on permutation results
-"""
-pvals(data;kwargs...) = pvals(data[2:end],data[1];kwargs...)
-function pvals(data::AbstractVector,stat::Real;type=:twosided)
-
-    data = vcat(stat,data)
-    if type == :greater || type  == :twosided
-        comp = >=
-        if type == :twosided
-            data = abs.(data)
-        end
-    elseif type == :lesser
-        comp = <=
-    else
-        error("not implemented")
-    end
-
-    pvals = sum(comp(stat[1]),data)/length(data) 
-    return pvals
-end
 
 """
 in some sense: `argsort(argunique(x))`, returns the indices to get a sorted unique of x
@@ -82,13 +97,24 @@ function multicol_minimum(x::AbstractMatrix,arrayOfIndicearrays::AbstractVector)
 end
 	
 """
+function troendle(perm::AbstractMatrix,stat::AbstractVector;type=:twosided)
+
 Multiple Comparison Correction as in Troendle 1995
+
+`perm` with size  ntests x nperms
+
+`stat` with size ntests
+
+`type` can be :twosided (default), :lesser, :greater
 
 Heavily inspired by the R implementation in permuco from Jaromil Frossard
 
+Note: While permuco is released under BSD, the author Jaromil Frossard gave us an MIT license for the troendle and the clusterdepth R-functions.
+
+
 """
-function troendle(perm::AbstractMatrix,stat::AbstractVector)
-	pAll = pvals_rankbased(perm,stat)
+function troendle(perm::AbstractMatrix,stat::AbstractVector;type=:twosided)
+	pAll = pvals_rankbased(perm,stat;type=type)
 
 	# get uncorrected pvalues of data
 	#@show size(pAll)
@@ -122,4 +148,3 @@ function troendle(perm::AbstractMatrix,stat::AbstractVector)
 	
 end
 
-end

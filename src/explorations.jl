@@ -1,3 +1,10 @@
+"""
+permute data and returns clusterdepth
+
+returns for each cluster-depth, the maximum stat-value over all detected clusters, from both sides at the same time
+    
+Conversely, perm_clusterdepths_both, returns the maximum stat-value from head and tail separately (combined after calcuating pvalues)
+"""
 function perm_clusterdepths_combined(rng,data,statFun)
 
 	Jₖ = spzeros(m-1,nₚ)

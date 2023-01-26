@@ -1,6 +1,8 @@
-using ClusterDepth
-using Test
-
+include("setup.jl")
 @testset "ClusterDepth.jl" begin
-    # Write your tests here.
+
+    include("troendle.jl")
+    include("cluster.jl")
+    include("utils.jl")
+    include("pvals.jl")
 end
