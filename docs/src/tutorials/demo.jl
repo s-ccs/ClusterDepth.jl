@@ -20,7 +20,7 @@ signal = repeat(signal,1,n_sub)
 data = randn(MersenneTwister(123),n_t,n_sub).+ snr .* signal
 
 ## by default assumes τ=2.3 (~alpha=0.05), and one-sample ttest
-pvals = clusterdepth(data)
+@time pvals = clusterdepth(data);
 
 f = Figure()
 ax = f[1,1] = Axis(f)
