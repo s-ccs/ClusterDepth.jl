@@ -80,6 +80,8 @@ end
 
 """
 finds neighbouring clusters in the vector and returns start + length vectors
+
+if the first and last cluster start on the first/last sample, we dont know their real depth
 """
 function cluster(data,τ)
 	label = label_components(data.>τ) 
@@ -94,6 +96,15 @@ function cluster(data,τ)
 		
 	end
 	len = stop .- start
-	
+
+	# if the first and last cluster start on the first/last sample, we dont know their real depth
+	if length(start) > 0 && start[end]+len[end] == length(data)
+		start = start[1:end-1]
+		len = len[1:end-1]
+	end
+	if length(start) > 0 && start[1] == 1
+		start = start[2:end]
+		len = len[2:end]
+	end
 	return start,len
 end

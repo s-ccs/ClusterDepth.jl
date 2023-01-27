@@ -36,18 +36,21 @@
     @test all((p.>0.05) .== [1,1,0,1,1,1,1,1,1,1,1])
 
 
-    p = ClusterDepth.pvals([0., 1., 2., 3., 4., 5.,6.,2.,6,],(cdm,cdm),0.9)
-    @test all((p.>0.05) .== [1,1,1,0,0,0,0,1,0])
+    p = ClusterDepth.pvals([0., 1., 2., 3., 4., 5.1,2.,6.,],(cdm,cdm),0.9)
+    @test all((p.>0.05) .== [1,1,1,1,1,1,1,1])
+
+    p = ClusterDepth.pvals([0., 1., 2., 3., 4., 5.1,2.,0,],(cdm,cdm),0.9)
+    @test all((p.>0.05) .== [1,1,1,0,0,0,1,1])
 
 
     p = ClusterDepth.pvals([0., 1., 2., 3., 4., 2.,1.,0.,6,],(cdm,cdm),0.9)
-    @test all((p.>0.05) .== [1,1,1,0,0,1,1,1,0])
+    @test all((p.>0.05) .== [1,1,1,0,0,1,1,1,1])
     end
 
     @testset "cluster" begin
-        s,l = ClusterDepth.cluster([4., 0., 10., 0., 3., 4., 0, 4., 4.,0., 0.],0.9)
-        @test s == [1,3,5,8]
-        @test l == [0,0,1,1]
+        s,l = ClusterDepth.cluster([4., 0., 10., 0., 3., 4., 0, 4., 4.,0., 0., 5.],0.9)
+        @test s == [3,5,8]
+        @test l == [0,1,1]
 
         s,l = ClusterDepth.cluster([0.,0.,0.,0.],0.9)
         @test s == []
