@@ -5,12 +5,18 @@
         rng = StableRNG(1)
         perm = randn(rng,ntests,nperm)
         stat = [0., 0., -1, 1,-3.5, 3, 10, 10, -10]
-        #permDat = vcat(dat,perm)
-         p_cor = troendle(perm,stat)
+    
+        p_cor = troendle(perm,stat)
 
-         @test length(p_cor) == ntests
-         @test all(p_cor[1:2].==1.0)
-         @test all(p_cor[7:9].==1 ./(1+nperm))
+        @test length(p_cor) == ntests
+        @test all(p_cor[1:2].==1.0)
+        @test all(p_cor[7:9].<0.008)
+        #
+        stat = [100.,100,100,100,100,100,100,100,100]
+        p_cor = troendle(perm,stat)
+        @test length(unique(p_cor)) == 1
+        @test all(p_cor.==(1/(1+nperm)))
+
 
 
          # sidedness
