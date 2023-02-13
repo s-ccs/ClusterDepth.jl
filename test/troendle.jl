@@ -12,8 +12,8 @@
         @test all(p_cor[1:2].==1.0)
         @test all(p_cor[7:9].<0.008)
         #
-        stat = [100.,100,100,100,100,100,100,100,100]
-        p_cor = troendle(perm,stat)
+        statSig = [100.,100,100,100,100,100,100,100,100]
+        p_cor = troendle(perm,statSig)
         @test length(unique(p_cor)) == 1
         @test all(p_cor.==(1/(1+nperm)))
 
