@@ -25,7 +25,9 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Demo" => "tutorials/demo.md",
+        "Tutorials"=>[
+            "An EEG Example" => "tutorials/eeg.md",
+        ],
 	"Reference" => [
 			"Clusterdepth FWER"=>"reference/type1.md",
 			"Troendle FWER" => "reference/type1_troendle.md",
