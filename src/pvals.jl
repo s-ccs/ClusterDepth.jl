@@ -10,7 +10,6 @@ if called with `stat`, first entry is assumed to be the observation
 """
 pvals(data;kwargs...) = pvals(data[2:end],data[1];kwargs...)
 function pvals(data::AbstractVector,stat::Real;type=:twosided)
-
     data = vcat(stat,data)
     if type == :greater || type  == :twosided
         comp = >=
@@ -36,7 +35,7 @@ Calculate pvals from cluster-depth permutation matrices
 pvals(stat,J::ClusterDepthMatrix,args...;kwargs...) = pvals(stat,(J,),args...;kwargs...)
 function pvals(stat,Jₖ::NTuple{T,ClusterDepthMatrix},τ;type=:troendle) where{T}
 
-    start,len = cluster(stat,τ) # get observed clusters
+    start,len = cluster(stat.>τ) # get observed clusters
     p = fill(1.,size(stat,1))
 
     if type == :troendle

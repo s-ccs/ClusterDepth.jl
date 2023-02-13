@@ -49,9 +49,17 @@ function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
 end
 
 
+"""
+calc_clusterdepth(data,τ)
 
+returns tuple with three entries:
+1:maxLength, maximal clustervalue per clusterdepth head, same for tail
+
+We assume data and τ have already been transformed for one/two sided testing, so that we can do d0.>τ for finding clusters
+
+"""
 function calc_clusterdepth(d0,τ)
-	startIX,len = cluster(d0,τ)
+	startIX,len = cluster(d0.>τ)
 	if isempty(len) # if nothing above threshold, just go on
 		return [],[],[]
 	end
@@ -82,9 +90,11 @@ end
 finds neighbouring clusters in the vector and returns start + length vectors
 
 if the first and last cluster start on the first/last sample, we dont know their real depth
+
+	Inputis assumed to be a thresholded Array with only 0/1
 """
-function cluster(data,τ)
-	label = label_components(data.>τ) 
+function cluster(data)
+	label = label_components(data) 
 	K = maximum(label)
 	start = fill(0, K)
 	stop = fill(0, K)

@@ -123,10 +123,15 @@ function troendle(perm::AbstractMatrix,stat::AbstractVector;type=:twosided)
 	pD_rank = tiedrank(pD)
 
     # test in ascending order, same p-vals will be combined later
-	testOrder = sort(unique(pD_rank))
 
+    # the following two lines are 
 	sortUn_ix = ix_sortUnique(pD_rank)
-	testOrder = pD_rank[sortUn_ix]
+
+    # these two lines would be identical
+	#testOrder = pD_rank[sortUn_ix]
+	#testOrder = sort(unique(pD_rank))
+
+    # as ranks can be tied, we have to take those columns, and run a "min" on them
 	testOrder_all = [findall(x.==pD_rank) for x in pD_rank[sortUn_ix]]
 
 	minPermPArray = multicol_minimum(pAll,testOrder_all)
@@ -136,7 +141,7 @@ function troendle(perm::AbstractMatrix,stat::AbstractVector;type=:twosided)
 
     # the following line can be made much faster by using views & reverse the arrays 
     #resortPermPArray = reverse(accumulate(min,reverse(minPermPArray),dims=2))
-	@views accumulate!(min,resortPermPArray[end:-1:1],minPermPArray[end:-1:1],dims=2)
+	@views accumulate!(min,resortPermPArray[:,end:-1:1],minPermPArray[:,end:-1:1],dims=2)
 	
 	pval_testOrder = pvals.(eachcol(resortPermPArray);type=:lesser)
 	
