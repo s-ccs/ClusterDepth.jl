@@ -10,12 +10,13 @@ using Distributions
 # Here we calculate the Family Wise Error of doing `ntests` at the same time.
 # That is, we want to check that Troendle indeed returns us a type-1 of 5% for a _set_ of tests.
 #
-# The point being, that if you do 20 tests, the chance that one is significant is actually $(@show 1-(1-0.05)^20) and not 5%
+# The point being, that if you do 30 tests, the chance that one is significant is not 5% but actually 
+(1-(1-0.05)^30)*100 ##%
 
 # Let's setup some simulation parameters
 reps = 1000
 perms = 1000
-ntests = 20;
+ntests = 30;
 
 # we will use the student-t in it's 2-sided variant (abs of it)
 fun = x->abs.(ClusterDepth.studentt(x));
@@ -36,17 +37,16 @@ data,stats_t,pvals = run_fun(1,perms,fun,ntests);
 println("data:", size(data)," t-stats:",size(stats_t)," pvals:",size(pvals))
 
 
-# run the above function $reps times - we also save the uncorrected t-based pvalue
+# run the above function `reps=1000`` times - we also save the uncorrected t-based pvalue
 pvals_all = fill(NaN,reps,2,ntests)
 @Threads.threads  for r = 1:reps
     data,stat,pvals = run_fun(r,perms,fun,ntests)
     pvals_all[r,1,:] = pvals
-    pvals_all[r,2,:] = 1 .- cdf.(TDist(size(data,2)),abs.(stat))
+    pvals_all[r,2,:] = (1 .- cdf.(TDist(size(data,2)),abs.(stat))).*2 # * 2 becaue of twosided. Troendle takes this into account already
 end;
 
-# Let's check in how many of our simlations we have a significant p-value =<0.05
-# (why test it against 0.025? this is due to the 2-sidedness of the test)
-res = any(pvals_all[:,:,:] .<= 0.025,dims=3)[:,:,1]
+# Let's check in how many of our simlations we have a significant p-value =<0.05 
+res = any(pvals_all[:,:,:] .<= 0.05,dims=3)[:,:,1]
 mean(res.>0,dims=1) |> x-> (:troendle=>x[1],:uncorrected=>x[2])
 
 # Nice. Troendle fits perfectly and the uncorrected is pretty close to what we calculated above!
