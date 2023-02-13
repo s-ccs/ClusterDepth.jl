@@ -25,7 +25,11 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Demo" => "tutorials/demo.md"
+        "Demo" => "tutorials/demo.md",
+	"Reference" => [
+			"Clusterdepth FWER"=>"reference/type1.md",
+			"Troendle FWER" => "reference/type1_troendle.md",
+			],
     ],
 )
 

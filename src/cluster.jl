@@ -64,7 +64,7 @@ function calc_clusterdepth(d0,τ)
 		return [],[],[]
 	end
 	
-	maxL = maximum(len) # go up only to max-depth
+	maxL = 1 + maximum(len) # go up only to max-depth
 	
 	valCol_head = Vector{Float64}(undef,maxL)
 	valCol_tail = Vector{Float64}(undef,maxL)
@@ -73,13 +73,16 @@ function calc_clusterdepth(d0,τ)
 	for j = fromTo
 		# go over clusters implicitly
 		# select clusters that are larger (at least one)
-		selIX = len.>=j
+		selIX = len.>=(j-1)
+		
+
 		
 		if !isempty(selIX)
-			ix= startIX[selIX] .+ j
+			ix= startIX[selIX] .+ (j - 1)
 			valCol_head[j]= maximum(d0[ix])
-			
-			ix= len[selIX] .+ startIX[selIX] .- j
+
+			# potential optimization is that for j = 0 and maxL = 0, tail and head are identical	
+			ix= startIX[selIX] .+ (len[selIX]) .- (j-1)
 			valCol_tail[j]= maximum(d0[ix])
 		end
 	end
