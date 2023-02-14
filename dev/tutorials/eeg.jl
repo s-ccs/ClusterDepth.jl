@@ -41,10 +41,10 @@ p300 = MixedModelComponent(;
 
 ## Start the simulation
 data, events = simulate(MersenneTwister(1), design, [p100,n170,p300], UniformOnset(; offset=5, width=4), RedNoise(noiselevel=1); return_epoched=true)
-times = range(0,stop=size(data,1)/250,length=size(data,1))
+times = range(0,stop=size(data,1)/250,length=size(data,1));
 
 # because the writer of this documentation is also  the author of Unfold, we are using Unfold on each subject to get one difference curve per subject
-allData = hcat(events,DataFrame(:eeg=>[[col...] for col in eachcol(data)]))
+allData = hcat(events,DataFrame(:eeg=>[[col...] for col in eachcol(data)]));
 
 # let's fit an Unfold Model for each subject
 models = groupby(allData,:subject) |> 
@@ -52,7 +52,7 @@ models = groupby(allData,:subject) |>
                                             @formula(0~1+condition),
                                             DataFrame(oneSubject),##events
                                             reshape(hcat(oneSubject.eeg...),1,length(oneSubject.eeg[1]),length(oneSubject.eeg)),
-                                            times)) =>"unfoldModel")
+                                            times)) =>"unfoldModel");
 
 
 # now we can inspect the data easily, and extract the face-effect
@@ -71,7 +71,7 @@ erpMatrix= unstack(faceCoefs,:subject,:time,:estimate)|>x->Matrix(x[:,2:end])'|>
 summary(erpMatrix)
 
 # ## Clusterdepth
-pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95),nperm=5000)
+pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95),nperm=5000);
 # well - that was fast, less than a second for a cluster permutation test. not bad at all!
 
 # ## Plotting
@@ -80,7 +80,7 @@ pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95),nperm=5
 # first calculate the ERP
 faceERP = groupby(faceCoefs,[:time,:coefname])|>
     x->combine(x,:estimate=>mean=>:estimate,
-                 :estimate=>std=>:stderror)
+                 :estimate=>std=>:stderror);
 
 # put the pvalues into a nicer format (in the future UnfoldMakie should do)
 plot_erp(faceERP; setExtraValues=(;stderror=true))
