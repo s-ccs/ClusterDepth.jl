@@ -23,7 +23,7 @@ For clustedepth we used 5000 repetitions, 5000 permutations, 200 tests.
 |simulation|noise|uncorrected|type|
 |---|---|---|---|
 |clusterdepth|white|1.0|0.0554|
-|clusterdepth|red*|XX|XX|
+|clusterdepth|red*|0.835|0.0394|
 |troendle|white|XX|XX|
 |troendle|red*|XX|XX|
 
