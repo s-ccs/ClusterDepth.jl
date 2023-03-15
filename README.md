@@ -37,8 +37,14 @@ Corrected should be 0.05 (CI-95 [0.043,0.0564])
 ## Citing
 Algorithm published in https://doi.org/10.1016/j.neuroimage.2021.118824 - Frossard & Renaud 2022, Neuroimage
 
+Please also cite this toolbox: [![DOI](https://zenodo.org/badge/593411464.svg)](https://zenodo.org/badge/latestdoi/593411464)
+
+
+
+
 Some functions are inspired by [R::permuco](https://cran.r-project.org/web/packages/permuco/index.html), written by Jaromil Frossard. Note: Permuco is GPL licensed, but Jaromil Frossard released the relevant clusteterdepth functions to me under MIT. Thereby, this repository can be licensed under MIT.
 
-XXX ZENODO LINK
+
+
 
  1 
