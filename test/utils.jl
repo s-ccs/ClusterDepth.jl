@@ -2,16 +2,20 @@
 
     m = [1 1 1;2 2 2;3 3 3;4 4 4]
     p = ClusterDepth.sign_permute(StableRNG(1),m,x->x)
-
-    @test p[1,:] == [1, -1, 1]
+    
+    @test p[1,:] == [1, -1, -1]
 
     # different seeds are different
     @test p!= ClusterDepth.sign_permute(StableRNG(3),m,x->x)
     # same seeds are the same
     @test p == ClusterDepth.sign_permute(StableRNG(1),m,x->x)
 
-    m = ones(1,10000)
+    m = ones(1,1000000)
     @test abs.(ClusterDepth.sign_permute(StableRNG(1),m,mean))<0.001
+
+    m = ones(1,2,3,4,5,6,7,100)
+    o = ClusterDepth.sign_permute(StableRNG(1),m,x->x)
+    @test sort(unique(mean(o,dims=1:ndims(o)-1))) == [-1.,1.]
     
 end
 
