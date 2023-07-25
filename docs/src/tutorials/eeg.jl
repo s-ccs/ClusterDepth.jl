@@ -59,11 +59,11 @@ models = groupby(allData,:subject) |>
 
 allEffects = combine(groupby(models,:subject),
     :unfoldModel=>(x->effects(Dict(:condition=>["car","face"]),x[1]))=>AsTable)
-plot_erp(allEffects;setMappingValues=(:color=>:condition,:group=>:subject))
+plot_erp(allEffects;mapping=(:color=>:condition,:group=>:subject))
 
 # extract the face-coefficient from the linear model
 allCoefs = combine(groupby(models,:subject),:unfoldModel=>(x->coeftable(x[1]))=>AsTable)
-plot_erp(allCoefs;setMappingValues=(:group=>:subject,col=:coefname))
+plot_erp(allCoefs;mapping=(:group=>:subject,col=:coefname))
 
 # let's unstack the tidy-coef table into a matrix and put it to clusterdepth for clusterpermutation testing
 faceCoefs = allCoefs|>x->subset(x,:coefname=>x->x.=="condition: face")
@@ -83,7 +83,7 @@ faceERP = groupby(faceCoefs,[:time,:coefname])|>
                  :estimate=>std=>:stderror);
 
 # put the pvalues into a nicer format (in the future UnfoldMakie should do)
-plot_erp(faceERP; setExtraValues=(;stderror=true))
+plot_erp(faceERP; extra=(;stderror=true))
 significant = (pvals.<=0.05) |>allowmissing
 significant[significant.==0] .= missing
 lines!(times,significant.*-1,color=:darkblue,linewidth=4)
@@ -92,5 +92,5 @@ current_figure()
 
 # Looks good to me! We identified the cluster :-)
 
-# old unused code to use setExtraValues=(;pvalue=pvalDF) in the plotting function, but didnt work.
+# old unused code to use extra=(;pvalue=pvalDF) in the plotting function, but didnt work.
 #pvalDF = ClusterDepth.cluster(pvals.<=0.05)|>x->DataFrame(:from=>x[1],:to=>x[1].+x[2],:coefname=>"condition: face")
