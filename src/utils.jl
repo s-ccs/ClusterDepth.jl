@@ -1,6 +1,7 @@
 
 studentt(x::AbstractMatrix) = (mean(x,dims=2)[:,1])./(std(x,dims=2)[:,1]./sqrt(size(x,2)-1))
 
+studentt(x::AbstractArray{<:Real,3}) = return dropdims(mapslices(studentt,x,dims=(2,3)),dims=3)
 
 """
 Permutation via random sign-flip

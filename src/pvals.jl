@@ -32,8 +32,9 @@ end
 """
 Calculate pvals from cluster-depth permutation matrices
 """
+pvals(stat::Matrix,args...;kwargs...) = mapslices(x->pvals(x,args...;kwargs...),stat;dims=(2))
 pvals(stat,J::ClusterDepthMatrix,args...;kwargs...) = pvals(stat,(J,),args...;kwargs...)
-function pvals(stat,Jₖ::NTuple{T,ClusterDepthMatrix},τ;type=:troendle) where{T}
+function pvals(stat::AbstractArray{<:Real,1},Jₖ::NTuple{T,ClusterDepthMatrix},τ;type=:troendle) where{T}
 
     start,len = cluster(stat.>τ) # get observed clusters
     p = fill(1.,size(stat,1))
