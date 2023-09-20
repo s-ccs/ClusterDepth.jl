@@ -1,7 +1,7 @@
 name = "ClusterDepth"
 uuid = "c8d8bbfa-f476-4995-adff-2987f04015d1"
-authors = ["Benedikt V. Ehinger"]
-version = "0.1.0"
+authors = ["Benedikt V. Ehinger","Maanik Marathe"]
+version = "0.1.1"
 
 [deps]
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
