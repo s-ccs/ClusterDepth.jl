@@ -10,7 +10,7 @@ using UnfoldMakie
 
 # ## How to use clusterDepth multiple comparison correction
 # !!! info
-#       Currently ClusterDepth.jl supports only a single channel. Multi-Channel support is described in the paper, but I dont know how well that algorithm works.
+#       This tutorial focuses on single-channel data. For multichannel data, see the tutorial "Further EEG Example".
 
 # Let's setup an EEG simulation using UnfoldSim.jl. We simulate a simple 1x2 design with 20 subjects, each with 40 trials
 n_subjects=20

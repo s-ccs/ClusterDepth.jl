@@ -27,6 +27,7 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials"=>[
             "An EEG Example" => "tutorials/eeg.md",
+            "Further EEG Example - Multichannel data" => "tutorials/eeg-multichannel.md",
         ],
 	"Reference" => [
 			"Clusterdepth FWER"=>"reference/type1.md",
