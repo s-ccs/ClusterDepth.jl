@@ -132,9 +132,22 @@ for i=1:(size(finalData,2)÷Δbin)
 end
 f_topo
 
-# Or with UnfoldMakie plot_topoplotseries:
-df = UnfoldMakie.eeg_matrix_to_dataframe(finalData[Not(remove_indices),:,1], string.(1:length(out)));
-plot_topoplotseries(df, Δbin; positions = out)
+## Or with UnfoldMakie plot_topoplotseries: (adapted from the tutorial)
+## first get the sample data
+data, positions = TopoPlots.example_data();
+
+## now transform the coordinates of the generated data to match the example data
+rect_sample = Rect(positions)
+rect_gen = Rect(out)
+factor = rect_sample.widths./rect_gen.widths
+function tfm_val(val::Point) 
+	return rect_sample.origin .+ (val.-rect_gen.origin).*factor; 
+end
+out2 = Point2f.(tfm_val.(out))
+
+## now create the dataframe and plot
+df = UnfoldMakie.eeg_matrix_to_dataframe(finalData[Not(remove_indices),:,1], string.(1:length(out2)));
+plot_topoplotseries(df, Δbin; positions = out2)
 
 # ## ClusterDepth
 # Now that the simulation is done, let's try out ClusterDepth and plot our results
