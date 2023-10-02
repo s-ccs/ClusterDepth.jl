@@ -1,7 +1,7 @@
 """
 calculate clusterdepth of given datamatrix. 
 
-clusterdepth([rng],data::AbstractMatrix,τ=2.3, statFun=twosided_studentt,nperm=5000;pval_type=:troendle)
+clusterdepth([rng],data::AbstractArray,τ=2.3, statFun=twosided_studentt,nperm=5000;pval_type=:troendle)
 
 	- `data`: `statFun` will be applied on second dimension of data (typically this will be subjects)
 
@@ -12,8 +12,8 @@ Optional
 	- `pval_type`: how to calculate pvalues within each cluster, default `:troendle`, see `?pvals`
 
 """
-clusterdepth(data::AbstractMatrix,args...;kwargs...) = clusterdepth(MersenneTwister(1),data,args...;kwargs...)
-function clusterdepth(rng,data::AbstractMatrix;τ=2.3, statFun=x->abs.(studentt(x)),permFun=sign_permute,nperm=5000,pval_type=:troendle)
+clusterdepth(data::AbstractArray,args...;kwargs...) = clusterdepth(MersenneTwister(1),data,args...;kwargs...)
+function clusterdepth(rng,data::AbstractArray;τ=2.3, statFun=x->abs.(studentt(x)),permFun=sign_permute,nperm=5000,pval_type=:troendle)
 	cdmTuple = perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=nperm)
 	return pvals(statFun(data),cdmTuple,τ;type=pval_type)
 end
@@ -23,8 +23,8 @@ end
 
 function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
 
-	Jₖ_head = spzeros(size(data,1),nₚ)
-	Jₖ_tail = spzeros(size(data,1),nₚ)
+	Jₖ_head = spzeros(size(data,2),nₚ)
+	Jₖ_tail = spzeros(size(data,2),nₚ)
 	
 	for i = 1:nₚ
 		# permute	
@@ -34,9 +34,12 @@ function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
 		(fromTo,head,tail) = calc_clusterdepth(d0,τ)
 		
 		# save it
-		Jₖ_head[fromTo,i]=head
-		Jₖ_tail[fromTo,i]=tail
-		
+		if !isempty(head)
+			Jₖ_head[fromTo,i]=head
+		end
+		if !isempty(tail)
+			Jₖ_tail[fromTo,i]=tail
+		end		
 	end
 	# shrink J_k
 
@@ -58,6 +61,39 @@ returns tuple with three entries:
 We assume data and τ have already been transformed for one/two sided testing, so that we can do d0.>τ for finding clusters
 
 """
+function calc_clusterdepth(d0::AbstractArray{<:Real,2},τ)
+	nchan = size(d0,1)
+
+	# save all the results from calling calc_clusterdepth on individual channels
+	(allFromTo, allHead, allTail) = (Array{Vector{Integer}}(undef, nchan),Array{Vector{Float64}}(undef, nchan),Array{Vector{Float64}}(undef, nchan))
+	fromTo = []
+	for i = 1: nchan
+		(a,b,c) = calc_clusterdepth(d0[i,:],τ);
+		allFromTo[i] = a
+		allHead[i] = b
+		allTail[i] = c
+		
+		if(length(a)>length(fromTo)) # running check to find the length ('fromTo') of the largest cluster
+			fromTo = a
+		end
+	end
+
+	# for each clusterdepth value, select the largest cluster value found across all channels
+	(head, tail) = (zeros(length(fromTo)),zeros(length(fromTo)));
+	for i in 1:nchan
+		for j in allFromTo[i]
+			if allHead[i][j] > head[j]
+				head[j] = allHead[i][j]
+			end
+			if allTail[i][j] > tail[j]
+				tail[j] = allTail[i][j]
+			end
+		end
+	end
+	
+	return fromTo, head, tail
+end
+
 function calc_clusterdepth(d0,τ)
 	startIX,len = cluster(d0.>τ)
 	if isempty(len) # if nothing above threshold, just go on
@@ -94,7 +130,7 @@ finds neighbouring clusters in the vector and returns start + length vectors
 
 if the first and last cluster start on the first/last sample, we dont know their real depth
 
-	Inputis assumed to be a thresholded Array with only 0/1
+	Input is assumed to be a thresholded Array with only 0/1
 """
 function cluster(data)
 	label = label_components(data) 

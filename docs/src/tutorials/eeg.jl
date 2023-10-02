@@ -94,5 +94,5 @@ current_figure()
 
 # Looks good to me! We identified the cluster :-)
 
-# old unused code to use setExtraValues=(;pvalue=pvalDF) in the plotting function, but didnt work.
+# old unused code to use extra=(;pvalue=pvalDF) in the plotting function, but didnt work.
 #pvalDF = ClusterDepth.cluster(pvals.<=0.05)|>x->DataFrame(:from=>x[1],:to=>x[1].+x[2],:coefname=>"condition: face")
