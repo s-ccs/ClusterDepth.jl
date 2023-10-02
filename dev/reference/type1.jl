@@ -24,7 +24,7 @@ first(generate(design),5)
 # We will use a simulated P300 signal, which at 250Hz has 113 samples.
 signal = MixedModelComponent(;
     basis=UnfoldSim.p300(;sfreq=250),
-    formula=@formula(dv ~ 1+condition+(1|subject)),
+    formula=@formula(0 ~ 1+condition+(1|subject)),
     β=[1.,0.0],
     σs = Dict(:subject=>[1]),
 );
