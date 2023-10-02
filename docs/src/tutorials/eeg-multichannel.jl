@@ -67,7 +67,7 @@ src_coords = [
 	[0 -50 40], #p300
 	[0 5 20], #p300
 ];
-closest_src_indices = closest_srcs(src_coords, model["pos"]);
+closest_src_indices = UnfoldSim.closest_srcs(src_coords, model["pos"]);
 
 # Get multichannel data by multiplying the simulated one-channel data with the factors we get from the leadfield matrix - repeat this for each of the 5 sources
 l =[];
@@ -147,7 +147,7 @@ out2 = Point2f.(tfm_val.(out))
 
 ## now create the dataframe and plot
 df = UnfoldMakie.eeg_matrix_to_dataframe(finalData[Not(remove_indices),:,1], string.(1:length(out2)));
-plot_topoplotseries(df, Δbin; positions = out2)
+plot_topoplotseries(df, Δbin; positions = out2,visual=(;enlarge=0.5,label_scatter=false))
 
 # ## ClusterDepth
 # Now that the simulation is done, let's try out ClusterDepth and plot our results
