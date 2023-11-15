@@ -4,8 +4,6 @@ CurrentModule = ClusterDepth
 
 # ClusterDepth
 
-Documentation for [ClusterDepth](https://github.com/behinger/ClusterDepth.jl).
-
 ## Comparison to permuco R implementation
 The implementation to Permuco is similar, but ClusterDepth.jl is more barebone - that is, we dont offer many permutation schemes, focus on the ClusterDepth Algorithm, and don't provide the nice wrappers like `clusterLM`.
 
