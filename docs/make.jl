@@ -14,7 +14,7 @@ for subfolder ∈ ["explanations","HowTo","tutorials","reference"]
 end
 makedocs(;
     modules=[ClusterDepth],
-    authors="Benedikt V. Ehinger",
+    authors="Benedikt V. Ehinger, Maanik Marathe",
     repo="https://github.com/s-ccs/ClusterDepth.jl/blob/{commit}{path}#{line}",
     sitename="ClusterDepth.jl",
     format=Documenter.HTML(;
