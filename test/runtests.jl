@@ -1,3 +1,5 @@
+using ClusterDepth
+
 include("setup.jl")
 @testset "ClusterDepth.jl" begin
 

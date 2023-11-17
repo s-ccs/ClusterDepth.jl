@@ -3,6 +3,7 @@ module ClusterDepth
 	using Random
 	using Images
 	using SparseArrays
+    #using ExtendableSparse
 	using StatsBase
 	import Base.show
 

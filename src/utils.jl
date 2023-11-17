@@ -7,17 +7,15 @@ studentt(x::AbstractArray{<:Real,3}) = return dropdims(mapslices(studentt,x,dims
 Permutation via random sign-flip
 Flips signs along the last dimension
 """
-function sign_permute(rng,x::AbstractArray,fun) 
+function sign_permute!(rng,x::AbstractArray,fun) 
 	n = ndims(x)
 	@assert n > 1 "vectors cannot be permuted"
 	
 	fl = rand(rng,[-1,1],size(x,n))
-	flipped = map((x,y)->x.*y,eachslice(x;dims=n),fl)
+	#flipped = map((x,y)->x.*y,eachslice(x;dims=n),fl)
+	for (f,k) = zip(fl,eachslice(x;dims=n))
+		k .*= f
+	end
 
-	y = similar(x)
-	for (ix,sl) = enumerate(eachslice(y;dims=n))
-		sl.=flipped[ix]
-	end 
-
-	return fun(y)
+	return fun(x)
 end
