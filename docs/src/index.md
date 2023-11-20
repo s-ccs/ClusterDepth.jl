@@ -11,9 +11,9 @@ Timing wise, a simple test on 50 subjects, 100 repetitions, 5000 permutations sh
 
 |timepoints|ClusterDepth.jl|permuco|julia-speedup|
 |---|---|---|---|
-|40|0.1s|2.9s|29x|
-|400|0.6s|22s|36x|
-|4000|7s|240s|34x|
+|40|0.03s|2.9s|~100x|
+|400|0.14s|22s|~160x|
+|4000|1.88s|240s|~120x|
 
 
 ```@index
