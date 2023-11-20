@@ -1,14 +1,14 @@
 @testset "sign_permute" begin
 
     m = [1 1 1;2 2 2;3 3 3;4 4 4]
-    p = ClusterDepth.sign_permute!(StableRNG(2),m,x->x)
+    p = ClusterDepth.sign_permute!(StableRNG(2),deepcopy(m),x->x)
     
     @test p[1,:] == [1, -1, 1]
 
     # different seeds are different
     @test p!= ClusterDepth.sign_permute!(StableRNG(3),deepcopy(m),x->x)
     # same seeds are the same
-    @test p == ClusterDepth.sign_permute!(StableRNG(3),deepcopy(m),x->x)
+    @test p == ClusterDepth.sign_permute!(StableRNG(2),deepcopy(m),x->x)
 
     m = ones(1,1000000)
     @test abs.(ClusterDepth.sign_permute!(StableRNG(1),deepcopy(m),mean))<0.001
