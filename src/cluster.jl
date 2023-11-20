@@ -57,18 +57,10 @@ function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
 			#Jₖ_tail[fromTo,i] .+=tail
 		end		
 	end
-	# shrink J_k
-
-		function shrink(x) 
-			i,j,v = findnz(x)
-			return sparse(i,j,v,maximum(i),nₚ)
-		end
-	#return all of it
-	#flush!(Jₖ_head)
-	#flush!(Jₖ_tail)
+	
 	Jₖ_head = sparse(rows_h,cols_h,vals_h)#SparseMatrixCSC(nₚ,maximum(rows_h), cols_h,rows_h,vals_h)
 	Jₖ_tail =sparse(rows_t,cols_t,vals_t)#SparseMatrixCSC(nₚ,maximum(rows_t), cols_t,rows_t,vals_t)
-		return ClusterDepthMatrix((Jₖ_head)), ClusterDepthMatrix((Jₖ_tail))
+	return ClusterDepthMatrix((Jₖ_head)), ClusterDepthMatrix((Jₖ_tail))
 end
 
 
