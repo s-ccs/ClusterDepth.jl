@@ -151,8 +151,8 @@ function cluster(data)
 	stop = fill(0, K)
 	for k= 1:K
 		#length[k] = sum(label.==k)
-		start[k]  = findfirst(label.==k)
-		stop[k]  = findlast(label.==k)
+		start[k]  = findfirst(==(k),label)
+		stop[k]  = findlast(==(k),label)
 		
 		
 	end
