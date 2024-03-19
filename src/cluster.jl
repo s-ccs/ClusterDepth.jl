@@ -1,44 +1,79 @@
 """
 
-clusterdepth(rng,data::AbstractArray;τ=2.3, statFun=x->abs.(studentt(x)),permFun=sign_permute!,nperm=5000,pval_type=:troendle)
+clusterdepth(rng,data::AbstractArray;τ=2.3, statfun=x->abs.(studentt(x)),permfun=sign_permute!,nperm=5000,pval_type=:troendle)
 
 calculate clusterdepth of given datamatrix. 
 
 
-- `data`: `statFun` will be applied on second dimension of data (typically this will be subjects)
+- `data`: `statfun` will be applied on second dimension of data (typically this will be subjects)
 
 Optional
 - `τ`: Cluster-forming threshold 
-- `statFun`: default  the one-sample `studenttest`, can be any custom function on a Matrix returning a Vector
-- `permFun`: default to sign-flip (for one-sample case)
 - `nperm`: number of permutations, default 5000
+- `stat_type`: default  the one-sample `t-test`, custom function can be specified (see `statfun!` and `statfun`)
+- `side_type`: default: `:abs` - what function should be applied after the `statfun`? could be `:abs`, `:square`, `:positive` to test positive clusters, `:negative` to test negative clusters. Custom function can be provided, see `sidefun``
+- `perm_type`: default `:sign` for one-sample data (e.g. differences), performs sign flips. custom function can be provided, see  `permfun`
 - `pval_type`: how to calculate pvalues within each cluster, default `:troendle`, see `?pvals`
+- `statfun` / `statfun!` a function that either takes one or two arguments and aggregates over last dimension. in the two argument case we expect the first argument to be modified inplace and provide a suitable Vector/Matrix.
+- `sidefun`: default `abs`. Provide a function to be applied on each element of the output of  `statfun`. 
+- `permfun` function to permute the data, should accept an RNG-object and the data. can be inplace, the data is copied, but the same array is shared between permutations
 
 """
 clusterdepth(data::AbstractArray,args...;kwargs...) = clusterdepth(MersenneTwister(1),data,args...;kwargs...)
-function clusterdepth(rng,data::AbstractArray;τ=2.3, statFun=x->abs.(studentt(x)),permFun=sign_permute!,nperm=5000,pval_type=:troendle)
-	cdmTuple = perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=nperm)
-	return pvals(statFun(data),cdmTuple,τ;type=pval_type)
+function clusterdepth(rng,data::AbstractArray;τ=2.3,stat_type=:onesample_ttest,perm_type=:sign,side_type=:abs,nperm=5000,pval_type=:troendle,statfun! = nothing,statfun=nothing)
+	if stat_type == :onesample_ttest
+		statfun! = studentt!
+		statfun = studentt
+	end
+	if perm_type == :sign
+		permfun = sign_permute!
+	end
+	if side_type == :abs
+		sidefun = abs
+	elseif side_type == :square
+		sidefun = x->x^2
+	elseif side_type == :negative
+		sidefun = x->-x
+	elseif side_type == :positive
+		sidefun = nothing # the default :)
+	else
+		@assert isnothing(side_type) "unknown side_type ($side_type) specified. Check your spelling and ?clusterdepth"
+	end
+
+	cdmTuple = perm_clusterdepths_both(rng,data,permfun,τ;nₚ=nperm,statfun! = statfun!,statfun=statfun,sidefun = sidefun)
+
+	return pvals(statfun(data),cdmTuple,τ;type=pval_type)
 end
 
 
 
 
-function perm_clusterdepths_both(rng,data,statFun,permFun,τ;nₚ=1000)
+function perm_clusterdepths_both(rng,data,permfun,τ;statfun = nothing,statfun! = nothing,nₚ=1000,sidefun=nothing)
+	@assert !(isnothing(statfun) && isnothing(statfun!)) "either statfun or statfun! has to be defined"
 	
-	#Jₖ_head = ExtendableSparseMatrix(size(data,2),nₚ)
-	#Jₖ_tail = ExtendableSparseMatrix(size(data,2),nₚ)
 	data_perm = deepcopy(data)
-	rows_h = Int[]
-	cols_h = Int[]
-	vals_h = Float64[]
-	rows_t = Int[]
-	cols_t = Int[]
-	vals_t = Float64[]
+	rows_h = Int[]; cols_h = Int[]; vals_h = Float64[]
+	rows_t = Int[]; cols_t = Int[]; vals_t = Float64[]
+	
+	if ndims(data_perm) == 2
+		d0 = Array{Float64}(undef,size(data_perm,1))
+	else
+		d0 = Array{Float64}(undef,size(data_perm)[[1,2]])
+	end
+	#@debug size(d0)
+	#@debug size(data_perm)
 	for i = 1:nₚ
 		# permute	
-		d0 = permFun(rng,data_perm,statFun)
-
+		d_perm = permfun(rng,data_perm)
+		if isnothing(statfun!)
+			d0 = statfun(d_perm)
+		else
+			# inplace!
+			statfun!(d0,d_perm)
+		end
+		if !isnothing(sidefun)
+			d0 .= sidefun.(d0)
+		end
 		# get clusterdepth
 		(fromTo,head,tail) = calc_clusterdepth(d0,τ)
 		
