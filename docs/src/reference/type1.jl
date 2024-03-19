@@ -35,7 +35,8 @@ signal = MixedModelComponent(;
 function run_fun(r)
     data, events = simulate(MersenneTwister(r), design, signal, UniformOnset(; offset=5, width=4), RedNoise(noiselevel=1); return_epoched=true)
     data = data[:,events.condition .== "small"] .- data[:,events.condition .== "large"]
-    return data,clusterdepth(data; τ=quantile(TDist(n_subjects - 1), 0.95),nperm=1000)
+    
+    return data,clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.95),nperm=1000)
 end;
 
 # ## Understanding the simulation
