@@ -19,8 +19,20 @@ Optional
 - `permfun` function to permute the data, should accept an RNG-object and the data. can be inplace, the data is copied, but the same array is shared between permutations
 
 """
-clusterdepth(data::AbstractArray, args...; kwargs...) = clusterdepth(MersenneTwister(1), data, args...; kwargs...)
-function clusterdepth(rng, data::AbstractArray; τ=2.3, stat_type=:onesample_ttest, perm_type=:sign, side_type=:abs, nperm=5000, pval_type=:troendle, (statfun!)=nothing, statfun=nothing)
+clusterdepth(data::AbstractArray, args...; kwargs...) =
+    clusterdepth(MersenneTwister(1), data, args...; kwargs...)
+function clusterdepth(
+    rng,
+    data::AbstractArray;
+    τ = 2.3,
+    stat_type = :onesample_ttest,
+    perm_type = :sign,
+    side_type = :abs,
+    nperm = 5000,
+    pval_type = :troendle,
+    (statfun!) = nothing,
+    statfun = nothing,
+)
     if stat_type == :onesample_ttest
         statfun! = studentt!
         statfun = studentt
@@ -40,15 +52,33 @@ function clusterdepth(rng, data::AbstractArray; τ=2.3, stat_type=:onesample_tte
         @assert isnothing(side_type) "unknown side_type ($side_type) specified. Check your spelling and ?clusterdepth"
     end
 
-    cdmTuple = perm_clusterdepths_both(rng, data, permfun, τ; nₚ=nperm, (statfun!)=statfun!, statfun=statfun, sidefun=sidefun)
+    cdmTuple = perm_clusterdepths_both(
+        rng,
+        data,
+        permfun,
+        τ;
+        nₚ = nperm,
+        (statfun!) = statfun!,
+        statfun = statfun,
+        sidefun = sidefun,
+    )
 
-    return pvals(statfun(data), cdmTuple, τ; type=pval_type)
+    return pvals(statfun(data), cdmTuple, τ; type = pval_type)
 end
 
 
 
 
-function perm_clusterdepths_both(rng, data, permfun, τ; statfun=nothing, (statfun!)=nothing, nₚ=1000, sidefun=nothing)
+function perm_clusterdepths_both(
+    rng,
+    data,
+    permfun,
+    τ;
+    statfun = nothing,
+    (statfun!) = nothing,
+    nₚ = 1000,
+    sidefun = nothing,
+)
     @assert !(isnothing(statfun) && isnothing(statfun!)) "either statfun or statfun! has to be defined"
 
     data_perm = deepcopy(data)
@@ -116,7 +146,11 @@ function calc_clusterdepth(d0::AbstractArray{<:Real,2}, τ)
     nchan = size(d0, 1)
 
     # save all the results from calling calc_clusterdepth on individual channels
-    (allFromTo, allHead, allTail) = (Array{Vector{Integer}}(undef, nchan), Array{Vector{Float64}}(undef, nchan), Array{Vector{Float64}}(undef, nchan))
+    (allFromTo, allHead, allTail) = (
+        Array{Vector{Integer}}(undef, nchan),
+        Array{Vector{Float64}}(undef, nchan),
+        Array{Vector{Float64}}(undef, nchan),
+    )
     fromTo = []
     for i = 1:nchan
         (a, b, c) = calc_clusterdepth(d0[i, :], τ)
@@ -131,7 +165,7 @@ function calc_clusterdepth(d0::AbstractArray{<:Real,2}, τ)
 
     # for each clusterdepth value, select the largest cluster value found across all channels
     (head, tail) = (zeros(length(fromTo)), zeros(length(fromTo)))
-    for i in 1:nchan
+    for i = 1:nchan
         for j in allFromTo[i]
             if allHead[i][j] > head[j]
                 head[j] = allHead[i][j]
@@ -157,7 +191,7 @@ function calc_clusterdepth(d0, τ)
     valCol_tail = Vector{Float64}(undef, maxL)
 
     fromTo = 1:maxL
-    for j = fromTo
+    for j in fromTo
         # go over clusters implicitly
         # select clusters that are larger (at least one)
         selIX = len .>= (j - 1)

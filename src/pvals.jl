@@ -9,7 +9,7 @@ calculates pvalues based on permutation results
 if called with `stat`, first entry is assumed to be the observation 
 """
 pvals(data; kwargs...) = pvals(data[2:end], data[1]; kwargs...)
-function pvals(data::AbstractVector, stat::Real; type=:twosided)
+function pvals(data::AbstractVector, stat::Real; type = :twosided)
     data = vcat(stat, data)
     if type == :greater || type == :twosided
         comp = >=
@@ -32,9 +32,16 @@ end
 """
 Calculate pvals from cluster-depth permutation matrices
 """
-pvals(stat::Matrix, args...; kwargs...) = mapslices(x -> pvals(x, args...; kwargs...), stat; dims=(2))
-pvals(stat, J::ClusterDepthMatrix, args...; kwargs...) = pvals(stat, (J,), args...; kwargs...)
-function pvals(stat::AbstractVector, Jₖ::NTuple{T,ClusterDepthMatrix}, τ; type=:troendle) where {T}
+pvals(stat::Matrix, args...; kwargs...) =
+    mapslices(x -> pvals(x, args...; kwargs...), stat; dims = (2))
+pvals(stat, J::ClusterDepthMatrix, args...; kwargs...) =
+    pvals(stat, (J,), args...; kwargs...)
+function pvals(
+    stat::AbstractVector,
+    Jₖ::NTuple{T,ClusterDepthMatrix},
+    τ;
+    type = :troendle,
+) where {T}
 
     start, len = cluster(stat .> τ) # get observed clusters
     p = fill(1.0, size(stat, 1))
@@ -68,9 +75,13 @@ function pvals(stat::AbstractVector, Jₖ::NTuple{T,ClusterDepthMatrix}, τ; typ
         for k = 1:length(start) # go over clusters
             for ix = start[k]:(start[k]+len[k])
 
-                p[ix] = (1 + sum(stat[ix] .<= getJVal(Jₖ[1].J, len[k]))) / (size(Jₖ[1].J, 2) + 1)
+                p[ix] =
+                    (1 + sum(stat[ix] .<= getJVal(Jₖ[1].J, len[k]))) /
+                    (size(Jₖ[1].J, 2) + 1)
                 if length(Jₖ) == 2
-                    tail_p = (1 + sum((stat[ix] .<= getJVal(Jₖ[2].J, len[k])))) ./ (size(Jₖ[2].J, 2) + 1)
+                    tail_p =
+                        (1 + sum((stat[ix] .<= getJVal(Jₖ[2].J, len[k])))) ./
+                        (size(Jₖ[2].J, 2) + 1)
                     p[ix] = max(p[ix], tail_p)
                 end
             end
