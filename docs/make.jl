@@ -6,10 +6,10 @@ DocMeta.setdocmeta!(ClusterDepth, :DocTestSetup, :(using ClusterDepth); recursiv
 
 
 GENERATED = joinpath(@__DIR__, "src")
-for subfolder ∈ ["explanations","HowTo","tutorials","reference"]
-    local SOURCE_FILES = Glob.glob(subfolder*"/*.jl", GENERATED)
+for subfolder ∈ ["explanations", "HowTo", "tutorials", "reference"]
+    local SOURCE_FILES = Glob.glob(subfolder * "/*.jl", GENERATED)
     #config=Dict(:repo_root_path=>"https://github.com/unfoldtoolbox/UnfoldSim")
-    foreach(fn -> Literate.markdown(fn, GENERATED*"/"*subfolder), SOURCE_FILES)
+    foreach(fn -> Literate.markdown(fn, GENERATED * "/" * subfolder), SOURCE_FILES)
 
 end
 makedocs(;
@@ -25,14 +25,14 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Tutorials"=>[
+        "Tutorials" => [
             "An EEG Example" => "tutorials/eeg.md",
-            "Further EEG Example - Multichannel data" => "tutorials/eeg-multichannel.md",
+            "EEG Example - Multichannel data" => "tutorials/eeg-multichannel.md",
         ],
-	"Reference" => [
-			"Clusterdepth FWER"=>"reference/type1.md",
-			"Troendle FWER" => "reference/type1_troendle.md",
-			],
+        "Reference" => [
+            "Clusterdepth FWER" => "reference/type1.md",
+            "Troendle FWER" => "reference/type1_troendle.md",
+        ],
     ],
 )
 
