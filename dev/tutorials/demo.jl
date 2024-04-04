@@ -31,6 +31,6 @@ h1 = scatter(f[1,2],pvals;axis=(;yscale=log10),label="troendle")
 
 pvals2 = clusterdepth(data;pval_type=:naive)
 h2 = scatter!(1.2:40.2,pvals2,color="red",label="naive")
-hlines!([0.05,0.01])
+#hlines!(([0.05]))
 axislegend()
 f
