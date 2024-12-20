@@ -1,7 +1,7 @@
 module ClusterDepth
 
 using Random
-using Images
+#using ImageMorphology
 using SparseArrays
 #using ExtendableSparse
 using StatsBase

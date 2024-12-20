@@ -1,5 +1,6 @@
 """
 
+using Base: Stateful
 clusterdepth(rng,data::AbstractArray;τ=2.3, statfun=x->abs.(studentt(x)),permfun=sign_permute!,nperm=5000,pval_type=:troendle)
 
 calculate clusterdepth of given datamatrix. 
@@ -24,14 +25,14 @@ clusterdepth(data::AbstractArray, args...; kwargs...) =
 function clusterdepth(
     rng,
     data::AbstractArray;
-    τ = 2.3,
-    stat_type = :onesample_ttest,
-    perm_type = :sign,
-    side_type = :abs,
-    nperm = 5000,
-    pval_type = :troendle,
-    (statfun!) = nothing,
-    statfun = nothing,
+    τ=2.3,
+    stat_type=:onesample_ttest,
+    perm_type=:sign,
+    side_type=:abs,
+    nperm=5000,
+    pval_type=:troendle,
+    (statfun!)=nothing,
+    statfun=nothing,
 )
     if stat_type == :onesample_ttest
         statfun! = studentt!
@@ -57,13 +58,13 @@ function clusterdepth(
         data,
         permfun,
         τ;
-        nₚ = nperm,
-        (statfun!) = statfun!,
-        statfun = statfun,
-        sidefun = sidefun,
+        nₚ=nperm,
+        (statfun!)=statfun!,
+        statfun=statfun,
+        sidefun=sidefun,
     )
 
-    return pvals(statfun(data), cdmTuple, τ; type = pval_type)
+    return pvals(statfun(data), cdmTuple, τ; type=pval_type)
 end
 
 
@@ -74,10 +75,10 @@ function perm_clusterdepths_both(
     data,
     permfun,
     τ;
-    statfun = nothing,
-    (statfun!) = nothing,
-    nₚ = 1000,
-    sidefun = nothing,
+    statfun=nothing,
+    (statfun!)=nothing,
+    nₚ=1000,
+    sidefun=nothing,
 )
     @assert !(isnothing(statfun) && isnothing(statfun!)) "either statfun or statfun! has to be defined"
 
@@ -186,7 +187,7 @@ function calc_clusterdepth(d0, τ)
     end
 
     maxL = 1 + maximum(len) # go up only to max-depth
-
+    #    @debug maxL
     valCol_head = Vector{Float64}(undef, maxL)
     valCol_tail = Vector{Float64}(undef, maxL)
 
@@ -217,25 +218,38 @@ if the first and last cluster start on the first/last sample, we dont know their
 
 	Input is assumed to be a thresholded Array with only 0/1
 """
-function cluster(data)
-    label = label_components(data)
-    K = maximum(label)
-    start = fill(0, K)
-    stop = fill(0, K)
-    for k = 1:K
-        #length[k] = sum(label.==k)
-        start[k] = findfirst(==(k), label)
-        stop[k] = findlast(==(k), label)
+function cluster(data::BitVector)
 
 
+    start = []
+    stop = []
+
+    state = false
+    for i in eachindex(data)
+        if data[i] == 1
+            if !state
+                append!(start, i)
+                state = true
+            end
+        else
+            if state
+                append!(stop, i - 1)
+                state = false
+            end
+        end
+
+    end
+
+
+
+
+
+    # if the first and last cluster start on the first/last sample, we dont know their real depth
+    if length(start) == length(stop) + 1
+        start = start[1:end-1]
     end
     len = stop .- start
 
-    # if the first and last cluster start on the first/last sample, we dont know their real depth
-    if length(start) > 0 && start[end] + len[end] == length(data)
-        start = start[1:end-1]
-        len = len[1:end-1]
-    end
     if length(start) > 0 && start[1] == 1
         start = start[2:end]
         len = len[2:end]

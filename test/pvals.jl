@@ -22,7 +22,7 @@
             [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0, 0.0, 0.0],
             cdm,
             0.1,
-            type = :naive,
+            type=:naive,
         )
         @test p[7] ≈ 1 / 1001
 
@@ -54,6 +54,8 @@
 
         p = ClusterDepth.pvals([0.0, 1.0, 2.0, 3.0, 4.0, 5.1, 2.0, 0], (cdm, cdm), 0.9)
         @test all((p .> 0.05) .== [1, 1, 1, 0, 0, 0, 1, 1])
+
+        start, len = ClusterDepth.cluster([0.0, 1.0, 2.0, 3.0, 4.0, 5.1, 2.0, 0] .> 0.9) # get observed clusters
 
 
         p = ClusterDepth.pvals([0.0, 1.0, 2.0, 3.0, 4.0, 2.0, 1.0, 0.0, 6], (cdm, cdm), 0.9)
