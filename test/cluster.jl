@@ -1,13 +1,21 @@
 @testset "cluster" begin
     s, l = ClusterDepth.cluster(
-        [4.0 0.0 10.0 0.0 3.0 4.0 0 4.0 4.0 0.0 0.0 5.0] .> 0.9,
+        [4.0, 0.0, 10.0, 0.0, 3.0, 4.0, 0, 4.0, 4.0, 0.0, 0.0, 5.0] .> 0.9,
     )
+
     @test s == [3, 5, 8]
     @test l == [0, 1, 1]
 
-    s, l = ClusterDepth.cluster([0.0 0.0 0.0 0.0] .> 0.9)
+    s, l = ClusterDepth.cluster([0.0, 0.0, 0.0, 0.0] .> 0.9)
     @test s == []
     @test l == []
+
+
+    s, l = ClusterDepth.cluster(
+        [4.0, 0.0, 10.0, 0.0, 3.0, 4.0, 0, 4.0, 4.0] .> 0.9,
+    )
+    @test s == [3, 5]
+    @test l == [0, 1]
 end
 
 @testset "Tests for 2D data" begin
