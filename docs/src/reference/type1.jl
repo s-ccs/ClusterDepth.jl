@@ -15,7 +15,11 @@ using DataFrames
 # ## Setup Simulation
 # Let's setup a simulation using UnfoldSim.jl. We simulate a simple 1x2 design with 20 subjects
 n_subjects = 20
-design = MultiSubjectDesign(n_subjects=n_subjects, n_items=2, items_between=Dict(:condition => ["small", "large"]))
+design = MultiSubjectDesign(
+    n_subjects=n_subjects,
+    n_items=2,
+    items_between=Dict(:condition => ["small", "large"]),
+)
 first(generate_events(design), 5)
 
 # 
@@ -33,11 +37,19 @@ signal = MixedModelComponent(;
 # Let's move the actual simulation into a function, so we can call it many times.
 # Note that we use (`RedNoise`)[https://unfoldtoolbox.github.io/UnfoldSim.jl/dev/literate/reference/noisetypes/] which has lot's of Autocorrelation between timepoints. nice!
 function run_fun(r)
-    data, events = simulate(MersenneTwister(r), design, signal, UniformOnset(; offset=5, width=4), RedNoise(noiselevel=1); return_epoched=true)
+    data, events = simulate(
+        MersenneTwister(r),
+        design,
+        signal,
+        UniformOnset(; offset=5, width=4),
+        RedNoise(noiselevel=1);
+        return_epoched=true,
+    )
     data = reshape(data, size(data, 1), :)
     data = data[:, events.condition.=="small"] .- data[:, events.condition.=="large"]
 
-    return data, clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=1000)
+    return data,
+    clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=1000)
 end;
 
 # ## Understanding the simulation
@@ -45,7 +57,12 @@ end;
 data, pval = run_fun(5)
 conditionSmall = data[:, 1:2:end]
 conditionLarge = data[:, 2:2:end]
-pval_uncorrected = 1 .- cdf.(TDist(n_subjects - 1), abs.(ClusterDepth.studentt(conditionSmall .- conditionLarge)))
+pval_uncorrected =
+    1 .-
+    cdf.(
+        TDist(n_subjects - 1),
+        abs.(ClusterDepth.studentt(conditionSmall .- conditionLarge)),
+    )
 sig = pval_uncorrected .<= 0.025;
 
 # For the uncorrected p-values based on the t-distribution, we get a type1 error over "time":
@@ -67,8 +84,8 @@ sig = allowmissing(sig)
 sig[sig.==0] .= missing
 @show sum(skipmissing(sig))
 lines!(sig, color=:gray, linewidth=4)
-lines!(ax, mean(conditionSmall, dims=2)[:, 1], solid_color=:red)
-lines!(ax, mean(conditionLarge, dims=2)[:, 1], solid_color=:blue)
+lines!(ax, mean(conditionSmall, dims=2)[:, 1], color=:red)
+lines!(ax, mean(conditionLarge, dims=2)[:, 1], color=:blue)
 
 hist!(Axis(f[3, 1], title="uncorrected pvalues"), pval_uncorrected, bins=0:0.01:1.1)
 hist!(Axis(f[3, 2], title="clusterdepth corrected pvalues"), pval, bins=0:0.01:1.1)
@@ -81,12 +98,13 @@ res = fill(NaN, reps, 2)
 Threads.@threads for r = 1:reps
     data, pvals = run_fun(r)
     res[r, 1] = mean(pvals .<= 0.05)
-    res[r, 2] = mean(abs.(ClusterDepth.studentt(data)) .>= quantile(TDist(n_subjects - 1), 0.975))
+    res[r, 2] =
+        mean(abs.(ClusterDepth.studentt(data)) .>= quantile(TDist(n_subjects - 1), 0.975))
 end;
 # Finally, let's calculate the percentage of simulations where we find a significant effect somewhere
 mean(res .> 0, dims=1) |> x -> (:clusterdepth => x[1], :uncorrected => x[2])
 
-# Nice, correction seems to work in principle :) Clusterdepth is not exactly 5%, but with more repetitions we should get there (e.g. with 5000 repetitions, we get 0.051%).
+# Nice, correction seems to work in principle :) Clusterdepth is not necessarily exactly 5%, but with more repetitions we should get there (e.g. with 5000 repetitions, we got 0.051%).
 
 # !!! info
-#       if you look closely, the `:uncorrected` value (around 60%) is not as bad as the 99% promised in the introduction. This is due to the correlation between the tests introduced by the noise. Indeed, a good exercise is to repeat everything, but put `RedNoise` to `WhiteNoise`
+#       if you look closely, the `:uncorrected` value (can be around 60%) is not as bad as the 99% promised in the introduction. This is due to the correlation between the tests introduced by the noise. Indeed, a good exercise is to repeat everything, but put `RedNoise` to `WhiteNoise`

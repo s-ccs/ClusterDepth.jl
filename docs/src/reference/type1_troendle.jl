@@ -50,23 +50,22 @@ end;
 res = any(pvals_all[:, :, :] .<= 0.05, dims=3)[:, :, 1]
 mean(res .> 0, dims=1) |> x -> (:troendle => x[1], :uncorrected => x[2])
 
-# Nice. Troendle fits perfectly and the uncorrected is pretty close to what we calculated above!
+# Nice. Troendle corrects the data and we are below 0.05. The  uncorrected simulations are close to what we calculated above!
 
 # Finally we end this with a short figure to get a better idea of how this data looks like and a histogram of the p-values
 
 f = Figure()
-ax = f[1, 1] = Axis(f)
+ax = f[1, 1] = Axis(f, title="t-values")
 
 
 
 lines!(ax, abs.(ClusterDepth.studentt(data)))
-heatmap!(Axis(f[2, 1]), data)
-series!(Axis(f[2, 2]), data[:, 1:7]')
-h1 = scatter!(Axis(f[1, 2]; yscale=log10), pvals, label="troendle")
+heatmap!(Axis(f[1, 2], title="heatmap of data"), data)
+series!(Axis(f[2, 2], title="data: subset of left plot"), data[:, 1:7]')
+h1 = scatter!(Axis(f[2, 1]; yscale=log10, title="troendle pvals"), pvals, label="troendle")
 
 hlines!([0.05, 0.01])
 
-hist!(Axis(f[3, 1]), pvals_all[:, 1, :][:], bins=0:0.01:1.1)
-hist!(Axis(f[3, 2]), pvals_all[:, 2, :][:], bins=0:0.01:1.1)
+hist!(Axis(f[3, 1], title="troendle corrected"), pvals_all[:, 1, :][:], bins=0:0.01:1.1)
+hist!(Axis(f[3, 2], title="uncorrected"), pvals_all[:, 2, :][:], bins=0:0.01:1.1)
 f
-
