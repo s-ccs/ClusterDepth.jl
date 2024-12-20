@@ -24,14 +24,14 @@ clusterdepth(data::AbstractArray, args...; kwargs...) =
 function clusterdepth(
     rng,
     data::AbstractArray;
-    τ = 2.3,
-    stat_type = :onesample_ttest,
-    perm_type = :sign,
-    side_type = :abs,
-    nperm = 5000,
-    pval_type = :troendle,
-    (statfun!) = nothing,
-    statfun = nothing,
+    τ=2.3,
+    stat_type=:onesample_ttest,
+    perm_type=:sign,
+    side_type=:abs,
+    nperm=5000,
+    pval_type=:troendle,
+    (statfun!)=nothing,
+    statfun=nothing,
 )
     if stat_type == :onesample_ttest
         statfun! = studentt!
@@ -57,13 +57,13 @@ function clusterdepth(
         data,
         permfun,
         τ;
-        nₚ = nperm,
-        (statfun!) = statfun!,
-        statfun = statfun,
-        sidefun = sidefun,
+        nₚ=nperm,
+        (statfun!)=statfun!,
+        statfun=statfun,
+        sidefun=sidefun,
     )
 
-    return pvals(statfun(data), cdmTuple, τ; type = pval_type)
+    return pvals(statfun(data), cdmTuple, τ; type=pval_type)
 end
 
 
@@ -74,10 +74,10 @@ function perm_clusterdepths_both(
     data,
     permfun,
     τ;
-    statfun = nothing,
-    (statfun!) = nothing,
-    nₚ = 1000,
-    sidefun = nothing,
+    statfun=nothing,
+    (statfun!)=nothing,
+    nₚ=1000,
+    sidefun=nothing,
 )
     @assert !(isnothing(statfun) && isnothing(statfun!)) "either statfun or statfun! has to be defined"
 
@@ -218,7 +218,7 @@ if the first and last cluster start on the first/last sample, we dont know their
 	Input is assumed to be a thresholded Array with only 0/1
 """
 function cluster(data)
-    label = label_components(data)
+    label = label_components(Matrix(data))
     K = maximum(label)
     start = fill(0, K)
     stop = fill(0, K)
