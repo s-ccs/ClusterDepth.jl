@@ -112,7 +112,7 @@ pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=
 # first calculate the ERP
 faceERP =
     groupby(faceCoefs, [:time, :coefname]) |>
-    x -> combine(x, :estimate => mean => :estimate, :estimate => x -> std(x) / sqrt(length(x)) => :stderror);
+    x -> combine(x, :estimate => mean => :estimate, :estimate => (x -> std(x) / sqrt(length(x))) => :stderror);
 
 # put the pvalues into a nicer format
 pvalDF =
@@ -122,6 +122,7 @@ pvalDF =
         :to => (x[1] .+ x[2]) ./ 250,
         :coefname => "condition: face",
     )
-plot_erp(faceERP; stderror=true, pvalue=pvalDF)
-
+plot_erp(faceERP; stderror=true, significance=pvalDF)
+hlines!([0])
+current_figure()
 # Looks good! We identified the cluster :-)
