@@ -26,20 +26,27 @@ function clusterdepth(
     rng,
     data::AbstractArray;
     τ=2.3,
-    stat_type=:onesample_ttest,
-    perm_type=:sign,
-    side_type=:abs,
-    nperm=5000,
-    pval_type=:troendle,
-    (statfun!)=nothing,
-    statfun=nothing,
+    stat_type = :onesample_ttest,
+    perm_type = :sign,
+    side_type = :abs,
+    nperm = 5000,
+    pval_type = :troendle,
+    (statfun!) = nothing,
+    statfun = nothing,
+	permfun = nothing,
 )
     if stat_type == :onesample_ttest
-        statfun! = studentt!
-        statfun = studentt
+		 if isnothing(statfun!)
+        	statfun! = studentt!
+		end
+		if  isnothing(statfun)
+        	statfun = studentt
+		end
     end
     if perm_type == :sign
+		if  isnothing(permfun)
         permfun = sign_permute!
+		end
     end
     if side_type == :abs
         sidefun = abs
