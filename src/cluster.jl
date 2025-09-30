@@ -64,7 +64,7 @@ function clusterdepth(
         sidefun=sidefun,
     )
 
-    return pvals(statfun(data), cdmTuple, τ; type=pval_type)
+    return pvals(sidefun(statfun(data)), cdmTuple, τ; type=pval_type)
 end
 
 
