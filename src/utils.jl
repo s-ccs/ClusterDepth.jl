@@ -73,7 +73,24 @@ function sign_permute!(rng, x::AbstractArray)
     return x
 end
 
-function batch_unpaired_ttest_unequal_var(x::AbstractArray, group)
+"""
+    studentt_unpaired(x::AbstractArray, group)
+
+Implements a unpaired two groups t-test with unequal variances. 10x as fast as HypothesisTests because we don't allocate that much
+Use like this:
+
+```julia
+studentt_unpaired([1,2,1,1,4,5,4],[false,false,false,false,true,true,true])
+```
+
+To use with ClusterDepth, you have to "bake-in" the group membership by defining your own method:
+```julia
+grp = ["bla","bla","bla","bla","blub","blub","blub"] .== "blub"
+my_statfun = x->studentt_unpaired(x,grp)
+```
+
+"""
+function studentt_unpaired(x::AbstractArray, group)
     x_reshaped = reshape(x, :, size(x, ndims(x)))
     x₁ = x_reshaped[:, group]
     x₂ = x_reshaped[:, .!group]
