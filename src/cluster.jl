@@ -34,7 +34,7 @@ function clusterdepth(
     (statfun!)=nothing,
     statfun=nothing,
 )
-    if stat_type == :onesample_ttest
+    if stat_type == :onesample_ttest && isnothing(statfun!) && isnothing(statfun)
         statfun! = studentt!
         statfun = studentt
     end
