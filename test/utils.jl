@@ -1,3 +1,4 @@
+using HypothesisTests
 @testset "sign_permute" begin
 
     m = [1 1 1; 2 2 2; 3 3 3; 4 4 4]
@@ -15,7 +16,7 @@
 
     m = ones(1, 2, 3, 4, 5, 6, 7, 100)
     o = ClusterDepth.sign_permute!(StableRNG(1), deepcopy(m))
-    @test sort(unique(mean(o, dims = 1:ndims(o)-1))) == [-1.0, 1.0]
+    @test sort(unique(mean(o, dims=1:ndims(o)-1))) == [-1.0, 1.0]
 
 
 end
