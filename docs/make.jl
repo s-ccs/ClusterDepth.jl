@@ -2,7 +2,7 @@ using ClusterDepth
 using Documenter
 using Glob
 using Literate
-DocMeta.setdocmeta!(ClusterDepth, :DocTestSetup, :(using ClusterDepth); recursive = true)
+DocMeta.setdocmeta!(ClusterDepth, :DocTestSetup, :(using ClusterDepth); recursive=true)
 
 
 GENERATED = joinpath(@__DIR__, "src")
@@ -13,21 +13,24 @@ for subfolder ∈ ["explanations", "HowTo", "tutorials", "reference"]
 
 end
 makedocs(;
-    modules = [ClusterDepth],
-    authors = "Benedikt V. Ehinger, Maanik Marathe",
-    repo = "https://github.com/s-ccs/ClusterDepth.jl/blob/{commit}{path}#{line}",
-    sitename = "ClusterDepth.jl",
-    format = Documenter.HTML(;
-        prettyurls = get(ENV, "CI", "false") == "true",
-        canonical = "https://s-ccs.github.io/ClusterDepth.jl",
-        edit_link = "main",
-        assets = String[],
+    modules=[ClusterDepth],
+    authors="Benedikt V. Ehinger, Maanik Marathe",
+    repo="https://github.com/s-ccs/ClusterDepth.jl/blob/{commit}{path}#{line}",
+    sitename="ClusterDepth.jl",
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://s-ccs.github.io/ClusterDepth.jl",
+        edit_link="main",
+        assets=String[],
     ),
-    pages = [
+    pages=[
         "Home" => "index.md",
         "Tutorials" => [
             "An EEG Example" => "tutorials/eeg.md",
             "EEG Example - Multichannel data" => "tutorials/eeg-multichannel.md",
+        ],
+        "HowTo" => [
+            "R: Between groups" => "howto/R_betweengroups.md",
         ],
         "Reference" => [
             "Clusterdepth FWER" => "reference/type1.md",
@@ -36,4 +39,4 @@ makedocs(;
     ],
 )
 
-deploydocs(; repo = "github.com/s-ccs/ClusterDepth.jl", devbranch = "main")
+deploydocs(; repo="github.com/s-ccs/ClusterDepth.jl", devbranch="main")
