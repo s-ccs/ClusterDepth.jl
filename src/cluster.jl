@@ -35,13 +35,9 @@ function clusterdepth(
     statfun = nothing,
 	permfun = nothing,
 )
-    if stat_type == :onesample_ttest
-		 if isnothing(statfun!)
-        	statfun! = studentt!
-		end
-		if  isnothing(statfun)
-        	statfun = studentt
-		end
+    if stat_type == :onesample_ttest && isnothing(statfun!) && isnothing(statfun)
+        statfun! = studentt!
+        statfun = studentt
     end
     if perm_type == :sign
 		if  isnothing(permfun)
