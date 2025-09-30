@@ -26,23 +26,23 @@ function clusterdepth(
     rng,
     data::AbstractArray;
     τ=2.3,
-    stat_type = :onesample_ttest,
-    perm_type = :sign,
-    side_type = :abs,
-    nperm = 5000,
-    pval_type = :troendle,
-    (statfun!) = nothing,
-    statfun = nothing,
-	permfun = nothing,
+    stat_type=:onesample_ttest,
+    perm_type=:sign,
+    side_type=:abs,
+    nperm=5000,
+    pval_type=:troendle,
+    (statfun!)=nothing,
+    statfun=nothing,
+    permfun=nothing,
 )
     if stat_type == :onesample_ttest && isnothing(statfun!) && isnothing(statfun)
         statfun! = studentt!
         statfun = studentt
     end
     if perm_type == :sign
-		if  isnothing(permfun)
-        permfun = sign_permute!
-		end
+        if isnothing(permfun)
+            permfun = sign_permute!
+        end
     end
     if side_type == :abs
         sidefun = abs
@@ -51,11 +51,15 @@ function clusterdepth(
     elseif side_type == :negative
         sidefun = x -> -x
     elseif side_type == :positive
-        sidefun = nothing # the default :)
+        sidefun = x -> x # the default :)
     else
         @assert isnothing(side_type) "unknown side_type ($side_type) specified. Check your spelling and ?clusterdepth"
     end
+    data_obs = sidefun.(statfun(data))
 
+    if any(data_obs[:, 1] .> τ) || any(data_obs[:, end] .> τ)
+        @warn "Your data shows a cluster that starts before the first sample, or ends after the last sample. There exists a fundamental limit in the ClusterDepth method, that the clusterdepth for such a cluster cannot be determined. Maybe you can extend the epoch to include more samples?"
+    end
     cdmTuple = perm_clusterdepths_both(
         rng,
         data,
@@ -67,7 +71,7 @@ function clusterdepth(
         sidefun=sidefun,
     )
 
-    return pvals(sidefun(statfun(data)), cdmTuple, τ; type=pval_type)
+    return pvals(data_obs, cdmTuple, τ; type=pval_type)
 end
 
 
@@ -109,9 +113,9 @@ function perm_clusterdepths_both(
             # inplace!
             statfun!(d0, d_perm)
         end
-        if !isnothing(sidefun)
-            d0 .= sidefun.(d0)
-        end
+
+        d0 .= sidefun.(d0)
+
         # get clusterdepth
         (fromTo, head, tail) = calc_clusterdepth(d0, τ)
 
