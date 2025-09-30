@@ -24,6 +24,9 @@ end
 @testset "studentt" begin
     x = randn(StableRNG(1), 10000, 50)
     t = ClusterDepth.studentt(x)
+
+    t_true = [HypothesisTests.OneSampleTTest(r).t for r in eachrow(x)]
+    @test all(t .≈ t_true)
     @test length(t) == 10000
     @test maximum(abs.(t)) < 10 # we'd need to be super lucky ;)
     @test mean(abs.(t) .> 2) < 0.06
@@ -40,6 +43,7 @@ end
     t = rand(10000)
     ClusterDepth.studentt!(t, x)
     @test t ≈ ClusterDepth.studentt(x)
+
     @test length(t) == 10000
     @test maximum(abs.(t)) < 10 # we'd need to be super lucky ;)
     @test mean(abs.(t) .> 2) < 0.06
@@ -53,4 +57,28 @@ end
     #3D input data
     data = randn(StableRNG(1), 3, 4, 5)
     @test size(ClusterDepth.studentt(data)) == (3, 4)
+end
+
+
+@testset begin
+    "ttest unpaired"
+    _x = randn(StableRNG(1), 10000, 50, 2)
+    x1 = _x[:, :, 1]
+    x2 = _x[:, :, 2]
+    x = hcat(x1, x2)
+    group = repeat([false, true], inner=size(x1, 2))
+    t = ClusterDepth.studentt_unpaired(x, group .== 1)
+
+    t_true = [HypothesisTests.UnequalVarianceTTest(r[group], r[.!group]).t for r in eachrow(x)]
+    @test all(t .≈ t_true)
+    @test length(t) == 10000
+
+
+    _x = randn(StableRNG(1), 10000, 50, 30, 2)
+    x1 = _x[:, :, :, 1]
+    x2 = _x[:, :, :, 2]
+    x = cat(x1, x2, dims=3)
+    group = repeat([false, true], inner=size(x1, 3))
+    t = ClusterDepth.studentt_unpaired(x, group .== 1)
+    @test size(t) == (1000, 50)
 end
