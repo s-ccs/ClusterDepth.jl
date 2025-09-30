@@ -90,7 +90,7 @@ my_statfun = x->studentt_unpaired(x,grp)
 ```
 
 """
-function studentt_unpaired(x::AbstractArray, group)
+function studentt_unpaired(x, group)
     x_reshaped = reshape(x, :, size(x, ndims(x)))
     x₁ = x_reshaped[:, group]
     x₂ = x_reshaped[:, .!group]

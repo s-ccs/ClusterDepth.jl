@@ -67,7 +67,9 @@ end
     x2 = _x[:, :, 2]
     x = hcat(x1, x2)
     group = repeat([false, true], inner=size(x1, 2))
+
     t = ClusterDepth.studentt_unpaired(x, group)
+
 
 
     t_true = [HypothesisTests.UnequalVarianceTTest(r[group], r[.!group]).t for r in eachrow(x)]
@@ -81,5 +83,5 @@ end
     x = cat(x1, x2, dims=3)
     group = repeat([false, true], inner=size(x1, 3))
     t = ClusterDepth.studentt_unpaired(x, group .== 1)
-    @test size(t) == (1000, 50)
+    @test size(t) == (10000, 50)
 end
