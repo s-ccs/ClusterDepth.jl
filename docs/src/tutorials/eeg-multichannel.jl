@@ -103,4 +103,3 @@ ax.xlabel = "time";
 ax.ylabel = "channel";
 Colorbar(fig[:, end+1], hm);
 fig
-loopvectorization
