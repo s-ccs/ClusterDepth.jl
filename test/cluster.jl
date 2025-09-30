@@ -59,9 +59,9 @@ end
     # test the warning that clusters must not begin/end with a potentially significant cluster
     data = randn(StableRNG(1), 23, 20)
     data[1:5, :] .+= 3
-    @test_warn x -> occursin("Your data shows a cluster", x) Warning ClusterDepth.clusterdepth(data; τ=0.4, nperm=5)
+    @test_warn x -> occursin("Your data shows a cluster", x) ClusterDepth.clusterdepth(data; τ=0.4, nperm=5)
     data = randn(StableRNG(1), 23, 20)
     data[23, :] .-= 3
-    @test_warn x -> occursin("Your data shows a cluster", x) Warning ClusterDepth.clusterdepth(data; τ=0.4, nperm=5)
+    @test_warn x -> occursin("Your data shows a cluster", x) ClusterDepth.clusterdepth(data; τ=0.4, nperm=5)
 
 end
