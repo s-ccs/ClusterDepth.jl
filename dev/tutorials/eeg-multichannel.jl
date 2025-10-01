@@ -44,7 +44,7 @@ headmodel_HArtMuT = headmodel()
 get_closest =
     coord ->
         UnfoldSim.closest_src(coord, headmodel_HArtMuT.cortical["pos"]) |>
-        pi -> magnitude(headmodel_HArtMuT; type="perpendicular")[:, pi]
+        pi -> magnitude(headmodel_HArtMuT)[:, pi]
 
 p1_l = p1 |> c -> MultichannelComponent(c, get_closest([-20, -78, -10]))
 p1_r = p1 |> c -> MultichannelComponent(c, get_closest([20, -78, -10]))
@@ -52,7 +52,7 @@ n170_r = n170 |> c -> MultichannelComponent(c, get_closest([50, -40, -25]))
 p300_do = p300 |> c -> MultichannelComponent(c, get_closest([0, -50, -40]))
 p300_up = p300 |> c -> MultichannelComponent(c, get_closest([0, 5, 20]))
 
-data, events = simulate(
+data, evts = simulate(
     MersenneTwister(1),
     design,
     [p1_l, p1_r, n170_r, p300_do, p300_up],
