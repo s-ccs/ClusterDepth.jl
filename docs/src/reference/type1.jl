@@ -37,7 +37,7 @@ signal = MixedModelComponent(;
 # Let's move the actual simulation into a function, so we can call it many times.
 # Note that we use (`RedNoise`)[https://unfoldtoolbox.github.io/UnfoldSim.jl/dev/literate/reference/noisetypes/] which has lot's of Autocorrelation between timepoints. nice!
 function run_fun(r)
-    data, events = simulate(
+    data, evts = simulate(
         MersenneTwister(r),
         design,
         signal,
@@ -46,10 +46,10 @@ function run_fun(r)
         return_epoched=true,
     )
     data = reshape(data, size(data, 1), :)
-    data = data[:, events.condition.=="small"] .- data[:, events.condition.=="large"]
+    data = data[:, evts.condition.=="small"] .- data[:, evts.condition.=="large"]
 
     return data,
-    clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=1000)
+    clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.975), nperm=1000, show_warnings=false)
 end;
 
 # ## Understanding the simulation
@@ -68,7 +68,6 @@ sig = pval_uncorrected .<= 0.025;
 # For the uncorrected p-values based on the t-distribution, we get a type1 error over "time":
 mean(sig)
 
-# this is the type 1 error of 5% we expected.
 
 # !!! note
 #       Type-I error is not the FWER (family wise error rate). FWER is the property of a set of tests (in this case tests per time-point), we can calculate it by repeating such tests,
@@ -97,7 +96,7 @@ reps = 500
 res = fill(NaN, reps, 2)
 Threads.@threads for r = 1:reps
     data, pvals = run_fun(r)
-    res[r, 1] = mean(pvals .<= 0.05)
+    res[r, 1] = mean(pvals .<= 0.05 / 2)
     res[r, 2] =
         mean(abs.(ClusterDepth.studentt(data)) .>= quantile(TDist(n_subjects - 1), 0.975))
 end;

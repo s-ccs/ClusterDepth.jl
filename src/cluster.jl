@@ -18,7 +18,7 @@ Optional
 - `statfun` / `statfun!` a function that either takes one or two arguments and aggregates over last dimension. in the two argument case we expect the first argument to be modified inplace and provide a suitable Vector/Matrix.
 - `sidefun`: default `abs`. Provide a function to be applied on each element of the output of  `statfun`. 
 - `permfun` function to permute the data, should accept an RNG-object and the data. can be inplace, the data is copied, but the same array is shared between permutations
-
+- `show_warnings`: default `true` - function to suppress warnings, useful for simulations
 """
 clusterdepth(data::AbstractArray, args...; kwargs...) =
     clusterdepth(MersenneTwister(1), data, args...; kwargs...)
@@ -34,6 +34,7 @@ function clusterdepth(
     (statfun!)=nothing,
     statfun=nothing,
     permfun=nothing,
+    show_warnings=false,
 )
     if stat_type == :onesample_ttest && isnothing(statfun!) && isnothing(statfun)
         statfun! = studentt!
@@ -57,7 +58,7 @@ function clusterdepth(
     end
     data_obs = sidefun.(statfun(data))
 
-    if any(data_obs[:, 1] .> τ) || any(data_obs[:, end] .> τ)
+    if show_warnings && (any(data_obs[:, 1] .> τ) || any(data_obs[:, end] .> τ))
         @warn "Your data shows a cluster that starts before the first sample, or ends after the last sample. There exists a fundamental limit in the ClusterDepth method, that the clusterdepth for such a cluster cannot be determined. Maybe you can extend the epoch to include more samples?"
     end
     cdmTuple = perm_clusterdepths_both(

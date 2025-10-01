@@ -26,15 +26,15 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Tutorials" => [
-            "An EEG Example" => "tutorials/generated/eeg.md",
-            "EEG Example - Multichannel data" => "tutorials/generated/eeg-multichannel.md",
+            "An EEG Example" => "generated/tutorials/eeg.md",
+            "EEG Example - Multichannel data" => "generated/tutorials/eeg-multichannel.md",
         ],
         "HowTo" => [
             "R: Between groups" => "howto/R_betweengroups.md",
         ],
         "Reference" => [
-            "Clusterdepth FWER" => "reference/generated/type1.md",
-            "Troendle FWER" => "reference/generated/type1_troendle.md",
+            "Clusterdepth FWER" => "generated/reference/type1.md",
+            "Troendle FWER" => "generated/reference/type1_troendle.md",
         ],
     ],
 )
