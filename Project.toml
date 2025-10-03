@@ -1,7 +1,7 @@
 name = "ClusterDepth"
 uuid = "c8d8bbfa-f476-4995-adff-2987f04015d1"
 authors = ["Benedikt V. Ehinger", "Maanik Marathe"]
-version = "0.2.5"
+version = "0.2.6"
 
 [deps]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
