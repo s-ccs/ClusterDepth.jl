@@ -59,7 +59,7 @@ function clusterdepth(
     data_obs = sidefun.(statfun(data))
 
     if show_warnings && (any(data_obs[:, 1] .> τ) || any(data_obs[:, end] .> τ))
-        @warn "Your data shows a cluster that starts before the first sample, or ends after the last sample. There exists a fundamental limit in the ClusterDepth method, that the clusterdepth for such a cluster cannot be determined. Maybe you can extend the epoch to include more samples?"
+        @warn "Your data shows a cluster that starts before the first sample, or ends after the last sample. There exists a fundamental limit in the ClusterDepth method, that the clusterdepth for such a cluster cannot be determined. Maybe you can extend the epoch to include more samples? This 'half'-cluster will be ignored and cannot become significant"
     end
     cdmTuple = perm_clusterdepths_both(
         rng,
