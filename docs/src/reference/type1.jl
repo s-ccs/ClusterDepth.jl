@@ -41,20 +41,20 @@ function run_fun(r)
         MersenneTwister(r),
         design,
         signal,
-        UniformOnset(; offset=5, width=4),
+        NoOnset(),
         RedNoise(noiselevel=1);
         return_epoched=true,
     )
     data = reshape(data, size(data, 1), :)
-    data = data[:, evts.condition.=="small"] .- data[:, evts.condition.=="large"]
+    data_diff = data[:, evts.condition.=="small"] .- data[:, evts.condition.=="large"]
 
     return data,
-    clusterdepth(data'; τ=quantile(TDist(n_subjects - 1), 0.975), nperm=1000, show_warnings=false)
+    clusterdepth(data_diff; τ=quantile(TDist(n_subjects - 1), 0.975), nperm=4000, show_warnings=false)
 end;
 
 # ## Understanding the simulation
 # let's have a look at the actual data by running it once, plotting condition wise trials, the ERP and histograms of uncorrected and corrected p-values
-data, pval = run_fun(5)
+data, pval = run_fun(1)
 conditionSmall = data[:, 1:2:end]
 conditionLarge = data[:, 2:2:end]
 pval_uncorrected =
@@ -96,7 +96,7 @@ reps = 500
 res = fill(NaN, reps, 2)
 Threads.@threads for r = 1:reps
     data, pvals = run_fun(r)
-    res[r, 1] = mean(pvals .<= 0.05 / 2)
+    res[r, 1] = mean(pvals .<= 0.05)
     res[r, 2] =
         mean(abs.(ClusterDepth.studentt(data)) .>= quantile(TDist(n_subjects - 1), 0.975))
 end;

@@ -1,3 +1,5 @@
+
+
 @testset "cluster" begin
     s, l = ClusterDepth.cluster(
         [4.0, 0.0, 10.0, 0.0, 3.0, 4.0, 0, 4.0, 4.0, 0.0, 0.0, 5.0] .> 0.9,
@@ -64,4 +66,12 @@ end
     data[23, :] .-= 3
     @test_warn x -> occursin("Your data shows a cluster", x) ClusterDepth.clusterdepth(data; τ=0.4, nperm=5)
 
+end
+
+@testset "sparse matrix size" begin
+    data = rand(StableRNG(42), 5, 10) .- 0.5
+    data[2, :] .+= 1
+    data[3, :] .+= 3
+    cdmTuple = ClusterDepth.perm_clusterdepths_both(StableRNG(1), data, (ClusterDepth.sign_permute!), 1.5; nₚ=1000, (statfun!)=(ClusterDepth.studentt!), sidefun=abs)
+    @test size(cdmTuple[1].J, 2) == 1000 # sparse matrix has to have the size of n-perms
 end
