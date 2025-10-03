@@ -266,4 +266,3 @@ function cluster(data::BitVector)
     end
     return start, len
 end
-show_warnings
