@@ -105,9 +105,11 @@ function perm_clusterdepths_both(
     end
     #@debug size(d0)
     #@debug size(data_perm)
+    #data_perm .-= mean(data_perm, dims=length(size(data_perm)))
     for i = 1:nₚ
         # permute	
         d_perm = permfun(rng, data_perm)
+
         if isnothing(statfun!)
             d0 = statfun(d_perm)
         else
@@ -136,8 +138,8 @@ function perm_clusterdepths_both(
         end
     end
 
-    Jₖ_head = sparse(rows_h, cols_h, vals_h)#SparseMatrixCSC(nₚ,maximum(rows_h), cols_h,rows_h,vals_h)
-    Jₖ_tail = sparse(rows_t, cols_t, vals_t)#SparseMatrixCSC(nₚ,maximum(rows_t), cols_t,rows_t,vals_t)
+    Jₖ_head = sparse(rows_h, cols_h, vals_h, maximum(rows_h), nₚ)#SparseMatrixCSC(nₚ,maximum(rows_h), cols_h,rows_h,vals_h)
+    Jₖ_tail = sparse(rows_t, cols_t, vals_t, maximum(rows_t), nₚ)#SparseMatrixCSC(nₚ,maximum(rows_t), cols_t,rows_t,vals_t)
     return ClusterDepthMatrix((Jₖ_head)), ClusterDepthMatrix((Jₖ_tail))
 end
 
@@ -264,3 +266,4 @@ function cluster(data::BitVector)
     end
     return start, len
 end
+show_warnings
