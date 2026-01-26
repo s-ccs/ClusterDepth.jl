@@ -75,3 +75,17 @@ end
     cdmTuple = ClusterDepth.perm_clusterdepths_both(StableRNG(1), data, (ClusterDepth.sign_permute!), 1.5; nₚ=1000, (statfun!)=(ClusterDepth.studentt!), sidefun=abs)
     @test size(cdmTuple[1].J, 2) == 1000 # sparse matrix has to have the size of n-perms
 end
+
+
+@testset "empty permutation" begin
+
+    ClusterDepth.perm_clusterdepths_both(
+        StableRNG(42),
+        rand(100, 10),
+        ClusterDepth.sign_permute!,
+        100;
+        statfun=x -> mean(x, dims=2),
+        nₚ=100,
+        sidefun=abs,
+    )
+end
