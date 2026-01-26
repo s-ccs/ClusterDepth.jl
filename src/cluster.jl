@@ -138,8 +138,8 @@ function perm_clusterdepths_both(
         end
     end
 
-    Jₖ_head = sparse(rows_h, cols_h, vals_h, maximum(rows_h), nₚ)#SparseMatrixCSC(nₚ,maximum(rows_h), cols_h,rows_h,vals_h)
-    Jₖ_tail = sparse(rows_t, cols_t, vals_t, maximum(rows_t), nₚ)#SparseMatrixCSC(nₚ,maximum(rows_t), cols_t,rows_t,vals_t)
+    Jₖ_head = sparse(rows_h, cols_h, vals_h, isempty(rows_h) ? 0 : maximum(rows_h), nₚ)
+    Jₖ_tail = sparse(rows_t, cols_t, vals_t, isempty(rows_t) ? 0 : maximum(rows_t), nₚ)
     return ClusterDepthMatrix((Jₖ_head)), ClusterDepthMatrix((Jₖ_tail))
 end
 
